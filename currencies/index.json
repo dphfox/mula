@@ -1,0 +1,7 @@
+{
+	"gbp": {
+		"name": "Great British Pound",
+		"currency_prefix": "£",
+		"dataset": "ons_cpi_mm23"
+	}
+}

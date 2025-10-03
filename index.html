@@ -3,10 +3,322 @@
 		<meta charset="UTF-8">
 		<meta name="viewport" content="width=device-width, initial-scale=1.0">
 		<title>mula</title>
+
+		<link rel="preconnect" href="https://fonts.googleapis.com">
+		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+		<link href="https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
+		<style>
+			* {
+				box-sizing: border-box;
+				margin: 0;
+				padding: 0;
+			}
+
+			:root {
+				color-scheme: light dark;
+				font-family: "Roboto", system-ui;
+
+				--page-width: 80rem;
+
+				--main: light-dark(#fff, #222);
+				--main-fg: light-dark(#222, #eee);
+				--behind: light-dark(#ddd, #111);
+
+				--accent: rgb(24, 158, 125);
+				--accent-fg: white;
+
+				accent-color: var(--accent);
+			}
+
+			mula-symbol {
+				&::before {
+					content: "µ";
+				}
+			}
+
+			h1 {
+				font-weight: 300;
+			}
+
+			h2 {
+				font-weight: 350;
+			}
+
+			article, header, footer {
+				line-height: 1.5;
+
+				& > h2 {
+					margin-top: 1.5em;
+				}
+
+				& > p {
+					margin-top: 0.5em;
+				}
+			}
+
+			p {
+				opacity: 0.9;
+			}
+
+			a {
+				color: var(--accent);
+			}
+
+			hr {
+				border: none;
+				background: var(--main-fg);
+				opacity: 0.2;
+			}
+
+			details {
+				&[open] > summary {
+					margin-bottom: 1em;
+				}
+			}
+
+			body {
+				background-color: var(--behind);
+				color: var(--main-fg);
+				display: flex;
+				flex-direction: column;
+				align-items: center;
+			}
+
+			body > * {
+				width: 100%;
+			}
+
+			body > header {
+				background-color: var(--accent);
+				color: var(--accent-fg);
+
+				padding-block: 5rem;
+				padding-inline: calc(max(1rem, 50% - var(--page-width) / 2));
+			}
+
+			body > article {
+				padding-block: 2rem;
+				padding-inline: calc(max(1rem, 50% - var(--page-width) / 2));
+			}
+
+			body > footer {
+				font-size: 0.8rem;
+				text-align: right;
+				opacity: 0.6;
+				padding-block: 2rem;
+				padding-inline: calc(max(1rem, 50% - var(--page-width) / 2));
+			}
+
+			body > converter-widget {
+				background-color: var(--main);
+				max-width: calc(var(--page-width) + 2rem);
+				margin-top: -2rem;
+
+				display: grid;
+				grid-template-columns: 1fr;
+				grid-auto-rows: auto;
+
+				border-radius: 0.5rem;
+				box-shadow: 0 1rem 2rem #0004;
+
+				& > hr {
+					height: 1px;
+				}
+
+				& > footer {
+					background: color-mix(in srgb, var(--behind) 50%, transparent);
+					/* box-shadow: inset 0 0.5rem 0.5rem -0.5rem #0004; */
+					font-size: 0.8rem;
+					padding: 1rem;
+
+					& > * {
+						opacity: 0.6;
+					}
+				}
+
+				& > money-input {
+					position: relative;
+					width: 100%;
+					padding: 2rem;
+					font-size: 5em;
+					font-weight: 300;
+
+					display: flex;
+					gap: 0.25em;
+
+					transition: color 0.2s ease;
+					&:focus-within {
+						color: color-mix(in srgb, var(--accent) 50%, var(--main-fg));
+					}
+
+					& > currency-prefix {
+						width: 1.75em;
+						opacity: 0.8;
+						text-align: right;
+					}
+
+					& > currency-label {
+						position: absolute;
+
+						inset: 1rem;
+						font-size: 0.8rem;
+						font-weight: 400;
+						opacity: 0.6;			
+
+						pointer-events: none;
+
+						transition: font-weight 0.2s ease;
+					}
+
+					&:focus-within > currency-label {
+						font-weight: 700;
+					}
+
+					& > input {
+						appearance: none;
+						border: none;
+						background: none;
+						font: inherit;
+						color: inherit;
+
+						width: 100%;
+
+						&:focus {
+							outline: none;
+						}
+					}
+				}
+			}
+		</style>
 	</head>
 	<body>
-		<main>
-			<
-		</main>
+		<header>
+			<h1>Convert to Mula</h1>
+			<p>
+				Mula is a fictional currency based on the real value of money.
+				Unlike actual currency, one Mula is always worth the same real
+				value.
+			</p>
+			<p>
+				With this converter, you can see what economic forces like
+				inflation are actually doing to your money. Try it below!
+			</p>
+		</header>
+		<converter-widget currency="GBP">
+			<money-input kind="actual">
+				<currency-prefix>£</currency-prefix>
+				<input id="actual-input" type="number" value="0">
+				<currency-label>Great British Pounds (£)</currency-label>
+			</money-input>
+			<hr>
+			<money-input kind="mula">
+				<currency-prefix>£<mula-symbol /></currency-prefix>
+				<input id="mula-input" type="number" value="0">
+				<currency-label>Great British Pound Mula (£<mula-symbol />)</currency-label>
+			</money-input>
+			<footer>
+				<details>
+					<summary>Dataset and license information</summary>
+					<p>Calculated using the <a href="foo" id="dataset-name">Dataset Name</a> dataset.</p>
+					<p id="dataset-license">Licensed under the Example license.</p>
+				</details>
+			</footer>
+		</converter-widget>
+		<article>
+			<h1>What is Mula?</h1>
+			<h2>The theory</h2>
+
+			<p>
+				One pound today isn't the same as one pound twenty years ago. Invisible economic
+				forces make your money worth less every day.
+			</p>
+
+			<p>
+				But you have no way of seeing that. When you hold a pound coin in your hand, it
+				looks the same. You don't literally see your pound coins shrink when they get
+				less valuable.
+			</p>
+
+			<p>
+				So everyone's walking around getting paid and saving up with money that quietly
+				gets cheaper over time. If I asked you how much money you've lost from that, you
+				almost certainly don't know. But it's a documented and important force on our
+				lives.
+			</p>
+
+			<h2>Real value economics</h2>
+
+			<p>
+				That's where the economics comes in. For decades, analysts and experts have
+				calculated and quantified the way that money loses value over time, by measuring
+				money's <em>real value</em>.
+			</p>
+
+			<p>
+				By calculating the real value of money, you can see what all of the invisible
+				economic forces are doing to your money. It's like seeing your pound coins
+				shrink every day. When you can see the problem, you can deal with it.
+			</p>
+
+			<p>
+				The problem is that most people don't know how to do those calculations. Even if
+				you know how, you probably aren't going to spend a lot of your time keeping up
+				to date on those calculations.
+			</p>
+
+			<h2>A better way</h2>
+
+			<p>
+				That's where the concept for Mula comes from. Mula is a fictional currency that
+				is entirely based on real value, not invisible economic forces.
+			</p>
+
+			<p>
+				When you convert the number on your payslip to Mula, you'll see what it's
+				actually worth. When you convert the number in your bank account to Mula, you
+				can see how it's actually changing over time. It's simple and it shows you what
+				your money's really doing.
+			</p>
+
+			<p>
+				Of course, Mula isn't a replacement for the proper calculations. It makes a few
+				assumptions and generalisations. However, it's meant to serve as a useful entry
+				point into the world of real value economics, and to empower ordinary people to
+				learn more about what their money does every day.
+			</p>
+		</article>
+		<footer>
+			<p>
+				Mula is a fictional currency invented by <a href="phfox.net">Daniel P H Fox</a> so they could
+				understand how their own money worked.
+			</p>
+			<p>
+				You can find the theory and source code for this page <a href="https://github.com/dphfox/mula/">on GitHub.</a>
+			</p>
+		</footer>
+		
+		<script defer>
+			let exchange_rate = 1.5;
+
+			let actual_input = document.querySelector("#actual-input")
+			let mula_input = document.querySelector("#mula-input")
+
+			function update_mula() {
+				mula_input.value = actual_input.value * exchange_rate;
+			}
+
+			function update_actual() {
+				actual_input.value = mula_input.value / exchange_rate;
+			}
+
+			actual_input.value = 100
+			update_mula()
+
+			actual_input.addEventListener("change", update_mula)
+			mula_input.addEventListener("change", update_actual)
+			
+			actual_input.addEventListener("keydown", () => setTimeout(update_mula, 10))
+			mula_input.addEventListener("keydown", () => setTimeout(update_actual, 10))
+		</script>
 	</body>
 </html>
