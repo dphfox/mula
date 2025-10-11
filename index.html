@@ -8,6 +8,15 @@
 		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 		<link href="https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
 		<style>
+			@keyframes shine-anim {
+				0% {
+					background-position: 100% 0;
+				}
+
+				100% {
+					background-position: 0% 0%;
+				}
+			}
 			* {
 				box-sizing: border-box;
 				margin: 0;
@@ -152,6 +161,18 @@
 						color: color-mix(in srgb, var(--accent) 50%, var(--main-fg));
 					}
 
+					&:has([disabled]) {
+						--shine: color-mix(in srgb, var(--main-fg) 10%, transparent);
+						background-image: linear-gradient(
+							90deg, 
+							transparent 40%, 
+							var(--shine) 50%, 
+							transparent 60%
+						);
+						background-size: 250% 100%;
+						animation: shine-anim 1s linear infinite;
+					}
+
 					& > currency-prefix {
 						width: 1.75em;
 						opacity: 0.8;
@@ -184,8 +205,16 @@
 
 						width: 100%;
 
+						opacity: 1;
+						transition: opacity 0.4s;
+
 						&:focus {
 							outline: none;
+						}
+
+						&[disabled] {
+							opacity: 0;
+							transition: opacity 0s;
 						}
 					}
 				}
@@ -208,13 +237,13 @@
 		<converter-widget currency="GBP">
 			<money-input kind="actual">
 				<currency-prefix>£</currency-prefix>
-				<input id="actual-input" type="number" value="0">
+				<input id="actual-input" type="number" value="0" disabled>
 				<currency-label>Great British Pounds (£)</currency-label>
 			</money-input>
 			<hr>
 			<money-input kind="mula">
 				<currency-prefix>£<mula-symbol /></currency-prefix>
-				<input id="mula-input" type="number" value="0">
+				<input id="mula-input" type="number" value="0" disabled>
 				<currency-label>Great British Pound Mula (£<mula-symbol />)</currency-label>
 			</money-input>
 			<footer>
@@ -299,28 +328,74 @@
 			</p>
 		</footer>
 		
-		<script defer>
-			let exchange_rate = 1.5;
+		<script type="module">
+			import { get_dataset } from "./currencies/gbp/datasets/ons_cpi_mm23.js"
 
-			let actual_input = document.querySelector("#actual-input")
-			let mula_input = document.querySelector("#mula-input")
+			function interpolate_index(dataset, date) {
+				let data = dataset.data;
+				let time = date.getTime() / 100000;
 
-			function update_mula() {
-				mula_input.value = actual_input.value * exchange_rate;
+				let left = 0;
+				let right = data.length - 1;
+				if (time <= data[left].time) {
+					return data[left].index;
+				} else if (time >= data[right].time) {
+					return data[right].index;
+				}
+
+				while (left < right - 1) {
+					let mid = (left + right) >> 1;
+					if (data[mid].time === time) {
+						return data[mid].index;
+					}
+					if (data[mid].time < time) {
+						left = mid;
+					} else {
+						right = mid;
+					}
+				}
+
+				let t0 = data[left].time;
+				let t1 = data[right].time;
+				let i0 = data[left].index;
+				let i1 = data[right].index;
+				let ratio = (target_time - t0) / (t1 - t0);
+				return i0 + ratio * (i1 - i0);
 			}
 
-			function update_actual() {
-				actual_input.value = mula_input.value / exchange_rate;
+			async function init() {
+				let dataset = await get_dataset();
+				document.querySelector("#dataset-name").innerText = dataset.name;
+				document.querySelector("#dataset-name").href = dataset.link;
+				document.querySelector("#dataset-license").innerText = dataset.license;
+
+				let exchange_rate = 1.0 / interpolate_index(dataset, new Date());
+
+				let actual_input = document.querySelector("#actual-input")
+				let mula_input = document.querySelector("#mula-input")
+
+				function update_mula() {
+					mula_input.value = Math.floor(actual_input.value * exchange_rate * 100) / 100;
+				}
+
+				function update_actual() {
+					actual_input.value =Math.floor(mula_input.value / exchange_rate * 100) / 100;
+				}
+
+				actual_input.value = 100
+				update_mula()
+
+				actual_input.addEventListener("change", update_mula)
+				mula_input.addEventListener("change", update_actual)
+				
+				actual_input.addEventListener("keydown", () => setTimeout(update_mula, 10))
+				mula_input.addEventListener("keydown", () => setTimeout(update_actual, 10))
+
+				actual_input.disabled = false;
+				mula_input.disabled = false;
 			}
 
-			actual_input.value = 100
-			update_mula()
-
-			actual_input.addEventListener("change", update_mula)
-			mula_input.addEventListener("change", update_actual)
-			
-			actual_input.addEventListener("keydown", () => setTimeout(update_mula, 10))
-			mula_input.addEventListener("keydown", () => setTimeout(update_actual, 10))
+			init()
 		</script>
 	</body>
 </html>
